@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="no-js">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="description" content="Clean Helmet - Sistema de Desinfecção Profissional com ESP32">
+  <meta name="keywords" content="capacete, desinfecção, ESP32, Raspberry Pi, Firebase, UV, ozônio">
+  <meta name="author" content="Clean Helmet Systems">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Clean Helmet">
+  
+  <title>Clean Helmet - Desinfecção Profissional</title>
+  
+  <!-- Preload critical resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles-touch-sequential-complete.css">
+  
+  <!-- Firebase SDK v9.22.0 (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  
+  <!-- PWA Manifest (desabilitado para desenvolvimento local) -->
+  <!-- <link rel="manifest" href="manifest.json"> -->
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
+  
+  <!-- Remove no-js class when JavaScript loads -->
+  <script>document.documentElement.classList.remove('no-js');</script>
+</head>
+
+<body class="theme-dark">
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">
+      🤖 Inicializando Clean Helmet...<br>
+      <small>Sistema de Desinfecção Profissional</small>
+    </div>
+  </div>
+
+  <!-- App Container -->
+  <body>
+<div id="clockDisplay" class="clock-display">
+  <span id="clockTime">--:--</span>
+  <span id="clockDate">--/--/----</span>
+</div>
+
+  <div class="main-layout">
+
+    <!-- Moldura de anúncios tipo smartphone -->
+    <div class="ads-phone-frame">
+      <div class="ads-phone-screen">
+        <div class="ads-container" id="adsContainer">
+          <!-- Slides de anúncios inseridos dinamicamente -->
+        </div>
+        <div class="ads-dots" id="adsDots"></div>
+      </div>
+    </div>
+
+    <!-- Área principal do sistema -->
+    <div class="cycle-section">
+      <div class="app-container">
+
+        <!-- Header -->
+        <header class="header">
+          <div class="logo-section">
+            <div class="helmet-icon"><img src="assets/logo.png" alt="Logo Clean Helmet" style="width: 65px; height: auto;" />
+            </div>
+            <div class="brand-info">
+              <h1>Clean Helmet</h1>
+              <p>Sistema Inteligente de Desinfecção</p>
+            </div>
+          </div>    
+        </header>
+
+        <!-- Status Display -->
+        <div class="status-display">
+          <div class="connection-status">
+            <div id="connectionStatus" class="status-indicator online"></div>
+            <span class="status-text">Sistema Online</span>
+          </div>
+          <div class="cycle-status-display">
+            <span id="cycleStatus" class="cycle-status">Aguardando</span>
+          </div>
+        </div>
+
+        <!-- Start Section -->
+        <div id="startSection" class="start-section">
+          <div class="start-content">
+            <div class="start-icon">
+              <div class="helmet-animation"><img src="assets/logo.png" alt="Logo Clean Helmet"
+ style="width: 100px; height: auto;" />
+</div>
+            </div>
+            <h2>Desinfecção Profissional</h2>
+            <p>Sistema inteligente de Desinfecção</p>
+            <div class="payment-info">
+              <strong>Ciclos adicionais:</strong> R$ 20,00 (PIX ou Cartão)
+            </div>
+            <button id="startBtn" class="start-btn">
+              <span class="btn-icon">🚀</span>
+              <span>Iniciar Desinfecção</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cycle Steps -->
+        <div id="cycleSteps" class="cycle-steps hidden">
+          <h3>🔄 Etapas do Processo</h3>
+          <div class="steps-container">
+            <!-- Step 1 -->
+            <div class="step-item" data-step="0">
+              <div class="step-icon">💨</div>
+              <div class="step-info">
+                <h4>Oxi-Sanitização</h4>
+                <p>Eliminação de germes e bactérias com ozônio controlado</p>
+              </div>
+              <div class="step-progress">
+                <svg class="progress-ring" width="60" height="60">
+                  <circle class="progress-ring-circle" cx="30" cy="30" r="25"></circle>
+                </svg>
+                <div class="progress-text">120s</div>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-item" data-step="1">
+              <div class="step-icon">❄️</div>
+              <div class="step-info">
+                <h4>Neutralização</h4>
+                <p>Dispersão segura do ozônio com ventilação</p>
+              </div>
+              <div class="step-progress">
+                <svg class="progress-ring" width="60" height="60">
+                  <circle class="progress-ring-circle" cx="30" cy="30" r="25"></circle>
+                </svg>
+                <div class="progress-text">30s</div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-item" data-step="2">
+              <div class="step-icon">🔆</div>
+              <div class="step-info">
+                <h4>UV Germicida</h4>
+                <p>Desinfecção por luz ultravioleta de alta intensidade</p>
+              </div>
+              <div class="step-progress">
+                <svg class="progress-ring" width="60" height="60">
+                  <circle class="progress-ring-circle" cx="30" cy="30" r="25"></circle>
+                </svg>
+                <div class="progress-text">90s</div>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-item" data-step="3">
+              <div class="step-icon">🌿</div>
+              <div class="step-info">
+                <h4>Desodorização</h4>
+                <p>Aplicação de fragrância fresh e finalização</p>
+              </div>
+              <div class="step-progress">
+                <svg class="progress-ring" width="60" height="60">
+                  <circle class="progress-ring-circle" cx="30" cy="30" r="25"></circle>
+                </svg>
+                <div class="progress-text">60s</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Safety Info -->
+        <div id="safetyInfo" class="safety-info hidden">
+          <div class="safety-card">
+            <div class="safety-icon">⚠️</div>
+            <div class="safety-content">
+              <h4>Informações de Segurança</h4>
+              <ul>
+                <li>🚪 Sensor de porta monitora abertura em tempo real</li>
+                <li>🌡️ Controle automático de temperatura pelos sensores</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completion Section -->
+        <div id="completionSection" class="completion-section hidden">
+          <div class="completion-content">
+            <div class="completion-icon"><img src="assets/check.png" alt="Logo Clean Helmet" style="width: 100px; height: auto;" /></div>
+            <h2>Desinfecção Concluída!</h2>
+            <p>Seu capacete foi desinfetado com sucesso</p>
+            <div class="completion-stats">
+              <div class="stat-item">
+                <span class="stat-value">99,9%</span>
+                <span class="stat-label">Germes eliminados</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">5 min</span>
+                <span class="stat-label">Tempo Total</span>
+              </div>
+            </div>
+            <button id="newCycleBtn" class="new-cycle-btn">
+              <span class="btn-icon">🔄</span>
+              <span>Novo Ciclo</span>
+            </button>
+          </div>
+        </div>
+
+      </div> <!-- app-container -->
+    </div> <!-- cycle-section -->
+
+  </div> <!-- main-layout -->
+</body>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-info">
+          <span>Clean Helmet v4.0.0</span>
+          <span>•</span>
+          <span>Desinfection</span>
+          <span>•</span>
+          <span>Integration</span>
+        </div>
+        
+        <div class="footer-controls">
+          <button class="footer-btn" title="Informações" onclick="alert('Clean Helmet v4.0.0\\nSistema ESP32 + Raspberry Pi + Firebase\\nDesenvolvido para tela touch 1280x800\\n\\nRecursos:\\n• Controle sequencial rigoroso\\n• Sensores em tempo real\\n• Sistema de pagamentos integrado\\n• 8 temas dinâmicos\\n• Otimização touch completa')">ℹ️</button>
+          <button class="footer-btn" title="Configurações" onclick="window.helmetMistApp?.openSettings()">⚙️</button>
+          <button class="footer-btn" title="Debug Console" onclick="console.log('=== CLEAN HELMET DEBUG INFO ==='); console.table(window.DEBUG?.info()); console.log('Use DEBUG.help() para comandos disponíveis');">🔧</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ Configurações</h3>
+        <button id="closeSettings" class="modal-close">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="setting-group">
+          <label for="themeSelect">🎨 Tema Visual:</label>
+          <select id="themeSelect">
+            <option value="dark">🌙 Dark Cyber</option>  
+          </select>
+        </div>
+        
+        <div class="setting-group">
+          <label for="volumeSlider">🔊 Volume do Sistema:</label>
+          <input type="range" id="volumeSlider" min="0" max="100" value="75">
+        </div>
+        
+        <div class="setting-group">
+          <label>Sistema:</label>
+          <div style="background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--border-radius-md); font-family: monospace; font-size: var(--font-size-sm);">
+            <div>• Sensores: Porta, Temperatura, Umidade, Ozônio, UV</div>
+            <div>• Relés: 7 canais (Ozônio, UV, Ventiladores, Bomba)</div>
+            <div>• Comunicação: Serial → Raspberry Pi → Firebase</div>
+            <div>• Monitoramento: Tempo real via WebSocket</div>
+          </div>
+        </div>
+        
+        <div class="setting-group">
+          <label>📱 Informações da Tela:</label>
+          <div style="background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--border-radius-md); font-family: monospace; font-size: var(--font-size-sm);">
+            <div>• Resolução: <span id="screenResolution">Carregando...</span></div>
+            <div>• Tipo: <span id="screenType">Carregando...</span></div>
+            <div>• Touch: <span id="touchSupport">Carregando...</span></div>
+            <div>• Orientação: <span id="screenOrientation">Carregando...</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications Container -->
+  <div id="notifications" class="notifications-container"></div>
+
+  <!-- 🆕 NOVOS MÓDULOS CLEAN HELMET v4.0.0 -->
+<script src="js/offline-manager.js"></script>
+<script src="js/session-manager.js"></script>
+<script src="js/mercadopago-manager.js"></script>
+  
+  <!-- JavaScript -->
+  <script src="clean-helmet-client-final.js"></script>
+  
+  <!-- Screen Info Script -->
+  <script>
+    // Atualiza informações da tela no modal de configurações
+    function updateScreenInfo() {
+      const screenRes = document.getElementById('screenResolution');
+      const screenType = document.getElementById('screenType');
+      const touchSupport = document.getElementById('touchSupport');
+      const screenOrientation = document.getElementById('screenOrientation');
+      
+      if (screenRes) screenRes.textContent = `${screen.width}x${screen.height}`;
+      if (screenType) screenType.textContent = window.innerWidth <= 1280 && window.innerHeight <= 800 ? 'Touch Otimizada' : 'Desktop';
+      if (touchSupport) touchSupport.textContent = 'ontouchstart' in window ? 'Suportado' : 'Não detectado';
+      if (screenOrientation) screenOrientation.textContent = window.innerWidth > window.innerHeight ? 'Paisagem' : 'Retrato';
+    }
+    
+    // Atualiza informações quando o modal é aberto
+    document.addEventListener('DOMContentLoaded', () => {
+      updateScreenInfo();
+      window.addEventListener('resize', updateScreenInfo);
+      window.addEventListener('orientationchange', () => {
+        setTimeout(updateScreenInfo, 100);
+      });
+    });
+  </script>
+
+  <!-- Service Worker Registration -->
+  <script>
+    // Registra Service Worker para PWA (se disponível)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => console.log('SW registered:', registration))
+          .catch(error => console.log('SW registration failed:', error));
+      });
+    }
+  </script>
+
+  <!-- Performance Monitoring -->
+  <script>
+    // Monitora performance da aplicação
+    window.addEventListener('load', () => {
+      const loadTime = performance.now();
+      console.log(`🚀 Clean Helmet carregado em ${Math.round(loadTime)}ms`);
+      
+      // Log para Firebase se disponível
+      setTimeout(() => {
+        if (window.helmetMistApp?.components?.firebaseManager) {
+          window.helmetMistApp.components.firebaseManager.log('app_loaded', {
+            loadTime: Math.round(loadTime),
+            userAgent: navigator.userAgent,
+            screenSize: `${screen.width}x${screen.height}`,
+            timestamp: Date.now()
+          });
+        }
+      }, 2000);
+    });
+  </script>
+
+  <!-- Error Handling -->
+  <script>
+    // Captura erros globais e remove loading se necessário
+    window.addEventListener('error', (event) => {
+      console.error('Erro global capturado:', event.error);
+      
+      // Remove loading overlay se ainda estiver presente
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Promise rejeitada:', event.reason);
+      
+      // Remove loading overlay se ainda estiver presente
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      if (loadingOverlay) {
+        loadingOverlay.style.display = 'none';
+      }
+    });
+  </script>
+
+  <!-- Touch Optimization -->
+  <script>
+    // Otimizações específicas para touch
+    document.addEventListener('DOMContentLoaded', () => {
+      // Previne zoom duplo toque
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', (event) => {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+
+      // Adiciona classe touch se suportado
+      if ('ontouchstart' in window) {
+        document.body.classList.add('touch-device');
+      }
+
+      // Otimização para tela 1280x800
+      if (window.innerWidth <= 1280 && window.innerHeight <= 800) {
+        document.body.classList.add('optimized-1280x800');
+      }
+    });
+  </script>
+
+  <!-- Manifest JSON inline (fallback) -->
+  <script type="application/json" id="manifest-fallback">
+    {
+      "name": "Clean Helmet - Sistema ESP32",
+      "short_name": "Clean Helmet",
+      "description": "Sistema de Desinfecção Profissional com ESP32 e Raspberry Pi",
+      "start_url": "/",
+      "display": "standalone",
+      "background_color": "#0f172a",
+      "theme_color": "#1e3a8a",
+      "orientation": "landscape",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><text y='0.9em' font-size='90'>🏍️</text></svg>",
+          "sizes": "512x512",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  </script>
+<script>
+  function updateClock() {
+    const now = new Date();
+    const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const date = now.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    document.getElementById('clockTime').textContent = time;
+    document.getElementById('clockDate').textContent = date;
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock(); // inicializa imediatamente
+</script>
+</body>
+</html>
+
+</body>
+</html>
