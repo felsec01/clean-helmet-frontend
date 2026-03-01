@@ -268,4 +268,5 @@ class SessionManager {
 }
 
 // Disponibiliza globalmente
+
 window.SessionManager = SessionManager;
