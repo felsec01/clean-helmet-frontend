@@ -29,8 +29,21 @@ const PAYMENT_CONFIG = {
   }
 };
 
-// ===== SOCKET CONFIG =====
-const SERVER_URL = "https://server-hibrido-js-1.onrender.com";
+// Detecta se está rodando local ou em produção
+const SERVER_URL = window.location.hostname === "localhost"
+  ? "http://localhost:3000"   // porta do backend local
+  : "https://server-hibrido-js-1.onrender.com"; // URL do Render
+
+// Conecta WebSocket
+const socket = io(SERVER_URL, { transports: ["websocket"] });
+
+socket.on("connect", () => {
+  console.log("✅ WebSocket conectado:", socket.id);
+});
+
+socket.on("disconnect", () => {
+  console.warn("❌ WebSocket desconectado");
+});
 
 // Função para registrar listeners do WebSocket
 function registerSocketListeners(onConnect, onDisconnect, onPaymentUpdate) {
@@ -2517,6 +2530,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
