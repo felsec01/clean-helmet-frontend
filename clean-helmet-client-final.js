@@ -470,25 +470,7 @@ startCycle() {
     if (themeBtn) themeBtn.textContent = icons[this.state.currentTheme] || '🌙';
   }
 
-  // ===== GERENCIAMENTO DE VOLUME =====
-  adjustVolume(delta) {
-    this.setVolume(this.state.volume + delta);
-  }
-
-  setVolume(volume) {
-    this.state.volume = Math.max(CONFIG.volume.min, Math.min(CONFIG.volume.max, volume));
-    this.updateVolumeDisplay();
-    this.saveSettings();
-  }
-
-  updateVolumeDisplay() {
-    const levelEl = document.getElementById('volumeLevel');
-    const sliderEl = document.getElementById('volumeSlider');
-    
-    if (levelEl) levelEl.textContent = `${this.state.volume}%`;
-    if (sliderEl) sliderEl.value = this.state.volume;
-  }
-
+  
   // ===== GERENCIAMENTO DE ANÚNCIOS =====
   initializeAds() {
     this.createAdsSlides();
@@ -1022,6 +1004,36 @@ class NotificationManager {
     Utils.log('NotificationManager destruído', 'warn');
   }
 }
+
+// ===== SOCKET LISTENERS =====
+function registerSocketListeners(onConnect, onDisconnect, onPaymentUpdate) {
+  // Conecta ao backend via Socket.IO
+  const socket = io(SERVER_URL, {
+    transports: ['websocket'], // força uso de WebSocket
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 2000
+  });
+
+  // Evento de conexão
+  socket.on('connect', () => {
+    Utils.log("🔌 Conectado ao servidor de pagamentos: " + socket.id, "success");
+    if (onConnect) onConnect(socket.id);
+  });
+
+  // Evento de desconexão
+  socket.on('disconnect', () => {
+    Utils.log("⚠️ Desconectado do servidor de pagamentos", "warn");
+    if (onDisconnect) onDisconnect();
+  });
+
+  // Evento de atualização de pagamento
+  socket.on('payment-status-update', (paymentData) => {
+    Utils.log("💳 Atualização de pagamento recebida:", "info", paymentData);
+    if (onPaymentUpdate) onPaymentUpdate(paymentData);
+  });
+}
+
 
 // ===== SISTEMA DE PAGAMENTOS INTEGRADO =====
 class PaymentManager {
@@ -2473,5 +2485,6 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
