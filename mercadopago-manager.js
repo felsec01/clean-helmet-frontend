@@ -636,4 +636,5 @@ class MercadoPagoManager {
 }
 
 // Disponibiliza globalmente
+
 window.MercadoPagoManager = MercadoPagoManager;
