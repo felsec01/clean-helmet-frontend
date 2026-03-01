@@ -1037,9 +1037,18 @@ class PaymentManager {
   }
 
   init() {
-    this.addPaymentStyles();
-    Utils.log('Sistema de pagamentos inicializado', 'success');
-  }
+  this.addPaymentStyles();
+  Utils.log('Sistema de pagamentos inicializado', 'success');
+
+  // Listener global de pagamento
+  registerSocketListeners(null, null, (paymentData) => {
+    if (paymentData.status === "approved") {
+      this.handlePaymentSuccess(document.querySelector('.payment-modal'), paymentData.method, paymentData.id);
+    } else if (paymentData.status === "rejected") {
+      this.handlePaymentTimeout(paymentData.method);
+    }
+  });
+}
 
   addPaymentStyles() {
     if (document.getElementById('payment-styles')) return;
@@ -1182,129 +1191,61 @@ class PaymentManager {
     return modal;
   }
 
-  initPixPayment(modal) {
-    const content = modal.querySelector('.payment-content');
+  async initPixPayment(modal) {
+  const content = modal.querySelector('.payment-content');
+  content.innerHTML = `
+    <div class="payment-header"><h3>📱 PIX</h3><button class="payment-close">✕</button></div>
+    <div class="payment-processing">
+      <div class="payment-spinner"></div>
+      <h4>Gerando código PIX...</h4>
+    </div>
+  `;
+
+  try {
+    const response = await fetch("https://server-hibrido-js-1.onrender.com/api/payments/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ method: "pix", amount: PAYMENT_CONFIG.prices.cycle })
+    });
+    const data = await response.json();
+
     content.innerHTML = `
-      <div class="payment-header"><h3>📱 PIX</h3><button class="payment-close">✕</button></div>
-      <div class="payment-processing">
-        <div class="payment-spinner"></div>
-        <h4>Gerando código PIX...</h4>
-      </div>
+      <div class="payment-header"><h3>📱 Pagamento PIX</h3><button class="payment-close">✕</button></div>
+      <iframe src="${data.init_point}" style="width:100%;height:500px;border:none;"></iframe>
     `;
 
-    setTimeout(() => {
-      const pixCode = this.generatePixCode();
-      content.innerHTML = `
-        <div class="payment-header"><h3>📱 Pagamento PIX</h3><button class="payment-close">✕</button></div>
-        <div class="pix-section">
-          <div class="pix-qr">📱</div>
-          <h4>Escaneie o QR Code ou copie o código:</h4>
-          <div class="pix-code">${pixCode}</div>
-          <button class="pix-copy-btn" onclick="navigator.clipboard?.writeText('${pixCode}')">
-            📋 Copiar Código PIX
-          </button>
-          <div class="payment-timer">
-            <div class="timer-label">Tempo restante:</div>
-            <div class="timer-value" id="pixTimer">05:00</div>
-          </div>
-        </div>
-      `;
-      this.startPixTimer(modal);
-      this.checkPixPaymentStatus(modal, pixCode);
-    }, 2000);
-
-    modal.querySelector('.payment-close').addEventListener('click', () => this.closePaymentModal());
+  } catch (error) {
+    Utils.log("Erro ao iniciar pagamento PIX", "error", error);
   }
+}
 
-  initCardPayment(modal) {
-    const content = modal.querySelector('.payment-content');
+  async initCardPayment(modal) {
+  const content = modal.querySelector('.payment-content');
+  content.innerHTML = `
+    <div class="payment-header"><h3>💳 Pagamento Cartão</h3><button class="payment-close">✕</button></div>
+    <div class="payment-processing">
+      <div class="payment-spinner"></div>
+      <h4>Conectando à máquina de cartão...</h4>
+    </div>
+  `;
+
+  try {
+    const response = await fetch("https://server-hibrido-js-1.onrender.com/api/payments/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ method: "card", amount: PAYMENT_CONFIG.prices.cycle })
+    });
+    const data = await response.json();
+
     content.innerHTML = `
       <div class="payment-header"><h3>💳 Pagamento Cartão</h3><button class="payment-close">✕</button></div>
-      <div class="card-machine-section">
-        <div style="font-size: 4rem; margin-bottom: 20px; animation: pulse 2s infinite;">💳</div>
-        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--primary-light); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
-          <h4 style="color: var(--primary-light); margin-bottom: 15px;">Instruções:</h4>
-          <ol style="text-align: left; color: var(--text-secondary); padding-left: 20px;">
-            <li style="margin-bottom: 8px;">Insira ou aproxime seu cartão</li>
-            <li style="margin-bottom: 8px;">Digite sua senha</li>
-            <li style="margin-bottom: 8px;">Aguarde a confirmação</li>
-          </ol>
-        </div>
-        <div class="payment-timer">
-          <div class="timer-label">Tempo limite:</div>
-          <div class="timer-value" id="cardTimer">01:00</div>
-        </div>
-      </div>
+      <iframe src="${data.init_point}" style="width:100%;height:500px;border:none;"></iframe>
     `;
 
-    modal.querySelector('.payment-close').addEventListener('click', () => this.closePaymentModal());
-    this.startCardTimer(modal);
-    this.waitForPhysicalMachine(modal);
+  } catch (error) {
+    Utils.log("Erro ao iniciar pagamento Cartão", "error", error);
   }
-
-  generatePixCode() {
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substr(2, 9);
-    return `00020126580014BR.GOV.BCB.PIX013662842f87-3e32-4750-8b25-${timestamp}${random}5204000053039865802BR5925CLEAN HELMET DESINFECCAO6009SAO PAULO62070503***6304`;
-  }
-
-  startPixTimer(modal) {
-    let timeLeft = PAYMENT_CONFIG.timeout.pix / 1000;
-    const timerInterval = setInterval(() => {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      const timerElement = modal.querySelector('#pixTimer');
-      if (timerElement) {
-        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      }
-      timeLeft--;
-      if (timeLeft < 0) {
-        clearInterval(timerInterval);
-        this.handlePaymentTimeout('PIX');
-      }
-    }, 1000);
-    this.timers.set('pixTimer', timerInterval);
-  }
-
-  startCardTimer(modal) {
-    let timeLeft = PAYMENT_CONFIG.timeout.card / 1000;
-    const timerInterval = setInterval(() => {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      const timerElement = modal.querySelector('#cardTimer');
-      if (timerElement) {
-        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      }
-      timeLeft--;
-      if (timeLeft < 0) {
-        clearInterval(timerInterval);
-        this.handlePaymentTimeout('Cartão');
-      }
-    }, 1000);
-    this.timers.set('cardTimer', timerInterval);
-  }
-
-  checkPixPaymentStatus(modal, pixCode) {
-    const checkInterval = setInterval(() => {
-      if (Math.random() < 0.3 && Date.now() % 10000 < 2000) {
-        clearInterval(checkInterval);
-        this.timers.delete('pixCheck');
-        this.handlePaymentSuccess(modal, 'PIX', pixCode);
-      }
-    }, 2000);
-    this.timers.set('pixCheck', checkInterval);
-  }
-
-  waitForPhysicalMachine(modal) {
-    const machineCheck = setInterval(() => {
-      if (Math.random() < 0.4 && Date.now() % 15000 < 3000) {
-        clearInterval(machineCheck);
-        this.timers.delete('machineCheck');
-        this.handlePaymentSuccess(modal, 'Cartão', 'CARD_' + Utils.generateId());
-      }
-    }, 2000);
-    this.timers.set('machineCheck', machineCheck);
-  }
+}
 
   handlePaymentSuccess(modal, method, transactionId) {
     this.clearAllTimers();
@@ -2532,4 +2473,5 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
