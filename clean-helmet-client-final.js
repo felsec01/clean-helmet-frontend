@@ -25,7 +25,7 @@ const PAYMENT_CONFIG = {
   methods: ['pix', 'card'],
   physicalMachine: { enabled: true, endpoint: '/api/card-machine', pollInterval: 2000 },
   backend: {
-    baseUrl: 'https://server-hibrido-js-1.onrender.com/api/mercadopago', // ⚠️ AJUSTAR PARA SEU BACKEND
+    baseUrl: 'https://server-hibrido-js-1.onrender.com', // ⚠️ AJUSTAR PARA SEU BACKEND
   }
 };
 
@@ -2514,6 +2514,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
