@@ -385,7 +385,8 @@ if (startBtn) {
 
   // ===== CONTROLE DE CICLO =====
   handleStartCycle() {
-  if (this.components.cycleManager.isRunning) {
+  console.log("DEBUG: handleStartCycle chamado");
+    if (this.components.cycleManager.isRunning) {
     this.showNotification('Ciclo já está em execução!', 'warning');
     return;
   }
@@ -402,6 +403,8 @@ if (startBtn) {
 
  // 🆕 Novo método para pagamentos (MercadoPago - novos componentes)
 initiatePaymentFlow() {
+  console.log("DEBUG: initiatePaymentFlow chamado");
+  
   try {
     if (this.components.mercadoPagoManager && this.components.mercadoPagoManager.isInitialized()) {
       this.components.mercadoPagoManager.showPaymentModal();
@@ -2514,6 +2517,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
