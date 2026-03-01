@@ -264,4 +264,5 @@ class OfflineManager {
 }
 
 // Disponibiliza globalmente
+
 window.OfflineManager = OfflineManager;
