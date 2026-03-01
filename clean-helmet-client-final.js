@@ -1037,7 +1037,7 @@ class NotificationManager {
 // ===== SOCKET LISTENERS =====
 function registerSocketListeners(onConnect, onDisconnect, onPaymentUpdate) {
   // Conecta ao backend via Socket.IO
-  const socket = io(https://server-hibrido-js-1.onrender.com/api/payments/webhook, {
+  const socket = io(https://server-hibrido-js-1.onrender.com, {
     transports: ['websocket'], // força uso de WebSocket
     reconnection: true,
     reconnectionAttempts: 5,
@@ -2514,6 +2514,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
