@@ -34,9 +34,15 @@ const SERVER_URL = window.location.hostname === "localhost"
   ? "http://localhost:3000"   // porta do backend local
   : "https://server-hibrido-js-1.onrender.com"; // URL do Render
 
-// Conecta WebSocket
-const socket = io(SERVER_URL, { transports: ["websocket"] });
+// Conexão única
+const socket = io(SERVER_URL, {
+  transports: ['websocket'],
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 2000
+});
 
+// Eventos básicos
 socket.on("connect", () => {
   console.log("✅ WebSocket conectado:", socket.id);
 });
@@ -45,15 +51,8 @@ socket.on("disconnect", () => {
   console.warn("❌ WebSocket desconectado");
 });
 
-// Função para registrar listeners do WebSocket
+// Função para registrar listeners adicionais
 function registerSocketListeners(onConnect, onDisconnect, onPaymentUpdate) {
-  const socket = io(SERVER_URL, {
-    transports: ['websocket'],
-    reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 2000
-  });
-
   socket.on('connect', () => {
     Utils.log("🔌 Conectado ao servidor de pagamentos: " + socket.id, "success");
     if (onConnect) onConnect(socket.id);
@@ -2530,6 +2529,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
