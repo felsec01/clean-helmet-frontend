@@ -29,6 +29,35 @@ const PAYMENT_CONFIG = {
   }
 };
 
+// ===== SOCKET CONFIG =====
+const SERVER_URL = "https://server-hibrido-js-1.onrender.com";
+
+// Função para registrar listeners do WebSocket
+function registerSocketListeners(onConnect, onDisconnect, onPaymentUpdate) {
+  const socket = io(SERVER_URL, {
+    transports: ['websocket'],
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 2000
+  });
+
+  socket.on('connect', () => {
+    Utils.log("🔌 Conectado ao servidor de pagamentos: " + socket.id, "success");
+    if (onConnect) onConnect(socket.id);
+  });
+
+  socket.on('disconnect', () => {
+    Utils.log("⚠️ Desconectado do servidor de pagamentos", "warn");
+    if (onDisconnect) onDisconnect();
+  });
+
+  socket.on('payment-status-update', (paymentData) => {
+    Utils.log("💳 Atualização de pagamento recebida:", "info", paymentData);
+    if (onPaymentUpdate) onPaymentUpdate(paymentData);
+  });
+}
+
+
             const FIREBASE_CONFIG = {
               // 🔥 FIREBASE CONFIGURADO - MODO ONLINE ATIVO
               // Credenciais do projeto: cleanhelmet-e55b7
@@ -2485,6 +2514,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
