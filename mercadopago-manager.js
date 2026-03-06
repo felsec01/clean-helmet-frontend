@@ -216,43 +216,63 @@ class MercadoPagoManager {
   }
 
   async createPIXPayment() {
-    // Simula resposta da API do Mercado Pago
+  try {
+    const response = await fetch("/api/create-preference", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        method: "pix",
+        amount: this.config.prices.cycle / 100 // valor em reais
+      })
+    });
+
+    const data = await response.json();
+
+    // O backend retorna init_point, sandbox_init_point e id
+    // Para PIX, você pode usar o sandbox_init_point para abrir checkout
+    // ou exibir o QR Code se estiver disponível
     return {
-      id: 'pix_' + Utils.generateId(),
-      qr_code: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-      qr_code_base64: '00020126580014BR.GOV.BCB.PIX0136' + Utils.generateId() + '5204000053039865802BR5925CLEAN HELMET DESINFECCAO6009SAO PAULO62070503***6304',
-      status: 'pending',
-      expiration_date: new Date(Date.now() + this.config.timeouts.pix).toISOString()
+      id: data.id,
+      qr_code: data.qr_code,               // imagem base64 oficial
+      qr_code_base64: data.qr_code_base64, // código copiável
+      sandbox_init_point: data.sandbox_init_point,
+      status: "pending"
     };
+  } catch (error) {
+    console.error("❌ Erro ao criar pagamento PIX:", error);
+    throw error;
   }
+}
 
   showPIXInterface(modal, pixPayment) {
-    const content = modal.querySelector('.payment-content');
-    content.innerHTML = `
-      <div class="payment-header">
-        <h3>📱 Pagamento PIX</h3>
-        <button class="payment-close">✕</button>
+  const content = modal.querySelector('.payment-content');
+  content.innerHTML = `
+    <div class="payment-header">
+      <h3>📱 Pagamento PIX</h3>
+      <button class="payment-close">✕</button>
+    </div>
+    <div class="pix-section">
+      <div class="pix-qr">
+        <img src="${pixPayment.qr_code}" alt="QR Code PIX" style="width:200px;height:200px;" />
       </div>
-      <div class="pix-section">
-        <div class="pix-qr">📱</div>
-        <h4>Escaneie o QR Code ou copie o código:</h4>
-        <div class="pix-code">${pixPayment.qr_code_base64}</div>
-        <button class="pix-copy-btn" onclick="navigator.clipboard?.writeText('${pixPayment.qr_code_base64}')">
-          📋 Copiar Código PIX
-        </button>
-        <div class="payment-timer">
-          <div class="timer-label">Tempo restante:</div>
-          <div class="timer-value" id="pixTimer">05:00</div>
-        </div>
+      <h4>Escaneie o QR Code ou copie o código:</h4>
+      <div class="pix-code">${pixPayment.qr_code_base64}</div>
+      <button class="pix-copy-btn" onclick="navigator.clipboard?.writeText('${pixPayment.qr_code_base64}')">
+        📋 Copiar Código PIX
+      </button>
+      <div class="payment-timer">
+        <div class="timer-label">Tempo restante:</div>
+        <div class="timer-value" id="pixTimer">05:00</div>
       </div>
-    `;
+    </div>
+  `;
 
-    this.state.currentPayment = pixPayment;
-    this.startPIXTimer(modal);
-    this.startPIXMonitoring(pixPayment.id);
+  this.state.currentPayment = pixPayment;
+  this.startPIXTimer(modal);
 
-    modal.querySelector('.payment-close').addEventListener('click', () => this.closePaymentModal());
-  }
+  // Agora não usa mais Math.random: espera o WebSocket atualizar status
+  modal.querySelector('.payment-close').addEventListener('click', () => this.closePaymentModal());
+}
 
   startPIXTimer(modal) {
     let timeLeft = this.config.timeouts.pix / 1000;
@@ -638,3 +658,4 @@ class MercadoPagoManager {
 // Disponibiliza globalmente
 
 window.MercadoPagoManager = MercadoPagoManager;
+
