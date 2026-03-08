@@ -70,23 +70,9 @@ function registerSocketListeners(onConnect, onDisconnect, onPaymentUpdate) {
 }
 
 
-            const FIREBASE_CONFIG = {
-              // 🔥 FIREBASE CONFIGURADO - MODO ONLINE ATIVO
-              // Credenciais do projeto: cleanhelmet-e55b7
-              // Status: CONECTADO AO FIREBASE REAL
-              
-              apiKey: "AIzaSyCO3ilDnLT2RjnFpzrIRBG1jxMrDppmEIA",
-              authDomain: "cleanhelmet-e55b7.firebaseapp.com",
-              databaseURL: "https://cleanhelmet-e55b7-default-rtdb.firebaseio.com",
-              projectId: "cleanhelmet-e55b7",
-              storageBucket: "cleanhelmet-e55b7.firebasestorage.app",
-              messagingSenderId: "862264948080",
-              appId: "1:862264948080:web:c45791659355e509634bb5",
-              measurementId: null                             // Não fornecido (opcional)
-              
-              // ✅ FIREBASE ATIVO: Sistema sairá automaticamente do modo demo
-              // 🚀 ESP32 + Raspberry Pi + Firebase totalmente integrados
-            };
+            const FIREBASE_CONFIG = window.CLEAN_HELMET_CONFIG.firebase;
+firebase.initializeApp(FIREBASE_CONFIG);
+
 
 const demoAds = [
   {
@@ -2529,6 +2515,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
