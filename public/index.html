@@ -459,41 +459,11 @@
   updateClock(); // inicializa imediatamente
 </script>
 
-<script>
-  console.log("=== Clean Helmet Diagnóstico ===");
-
-  // Verifica se o botão existe
-  const btn = document.getElementById('startBtn');
-  console.log("Botão #startBtn encontrado?", !!btn);
-
-  // Força clique no botão (apenas para teste)
-  if (btn) {
-    console.log("Forçando clique no botão...");
-    btn.click();
-  }
-
-  // Verifica se o app inicializou
-  console.log("App inicializado?", window.helmetMistApp?.state?.initialized);
-
-  // Verifica Firebase
-  try {
-    console.log("Firebase carregado?", typeof firebase !== "undefined");
-    console.log("Firebase apps ativos:", firebase.apps?.length || 0);
-  } catch (e) {
-    console.warn("Firebase não disponível:", e);
-  }
-
-  // Verifica Socket.IO
-  console.log("Socket.IO carregado?", typeof io !== "undefined");
-
-  // Verifica se socket foi criado
-  console.log("Socket conectado?", window.socket?.connected);
-</script>
-
   
 </body>
 
 </html>
+
 
 
 
