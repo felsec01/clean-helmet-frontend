@@ -19,6 +19,7 @@ const CACHE_URLS = [
 
   '/manifest.json',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+  'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2',
   'https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js',
   'https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js',
   'https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js',
@@ -78,6 +79,7 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
 
 
 
