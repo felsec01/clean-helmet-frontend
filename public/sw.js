@@ -19,10 +19,10 @@ const CACHE_URLS = [
 
   '/manifest.json',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-  'https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js',
-  'https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js',
-  'https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js',
-  'https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js'
+  'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js',
+  'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js',
+  'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js',
+  'https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js'
 ];
 
 // Instalação do Service Worker
@@ -78,6 +78,7 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
 
 
 
