@@ -10,12 +10,13 @@ const CACHE_URLS = [
   '/js/offline-manager.js',
   '/js/session-manager.js',
   '/js/mercadopago-manager.js',
-  '/clean-helmet-client-final.js',
-  
+  '/js/socket-manager.js',
+  '/js/clean-helmet-client-final.js',
+
   // Imagens
   '/img/logo.png',
   '/img/check.png',
-  
+
   '/manifest.json',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
   'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js',
@@ -77,4 +78,5 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
 
