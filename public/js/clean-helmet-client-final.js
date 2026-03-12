@@ -162,16 +162,12 @@ socket.on("system-log", (msg) => {
   window.helmetMistApp?.showNotification(`📝 Log: ${msg}`, "info");
 });
 
-            // Inicializa Firebase buscando config do backend
-fetch("/firebase-config")
-  .then(res => res.json())
-  .then(config => {
-    firebase.initializeApp(config);
-    Utils.log("🔥 Firebase inicializado com config do backend", "success");
-  })
-  .catch(err => {
-    Utils.log("Erro ao carregar Firebase config", "error", err);
-  });
+            // Inicializa Firebase usando config.js do frontend
+const FIREBASE_CONFIG = window.CLEAN_HELMET_CONFIG.firebase;
+firebase.initializeApp(FIREBASE_CONFIG);
+
+Utils.log("🔥 Firebase inicializado com config do frontend", "success");
+
 
 const demoAds = [
   {
@@ -2551,6 +2547,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
