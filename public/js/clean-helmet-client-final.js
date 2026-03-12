@@ -34,40 +34,61 @@ const SERVER_URL = window.location.hostname === "localhost"
   ? "http://localhost:3000"   // porta do backend local
   : "https://server-hibrido-js-1.onrender.com"; // URL do Render
 
-// Conexão única
-const socket = io(SERVER_URL, {
-  transports: ['websocket'],
-  reconnection: true,
-  reconnectionAttempts: 5,
-  reconnectionDelay: 2000
-});
+// === Integração de Socket.IO com a UI ===
 
-// Eventos básicos
+// Conexão e desconexão
 socket.on("connect", () => {
-  console.log("✅ WebSocket conectado:", socket.id);
+  Utils.log("✅ Conectado ao servidor", "success");
+  window.helmetMistApp?.updateConnectionStatus("Conectado");
 });
 
 socket.on("disconnect", () => {
-  console.warn("❌ WebSocket desconectado");
+  Utils.log("⚠️ Desconectado do servidor", "warn");
+  window.helmetMistApp?.updateConnectionStatus("Desconectado");
 });
 
-// Função para registrar listeners adicionais
-function registerSocketListeners(onConnect, onDisconnect, onPaymentUpdate) {
-  socket.on('connect', () => {
-    Utils.log("🔌 Conectado ao servidor de pagamentos: " + socket.id, "success");
-    if (onConnect) onConnect(socket.id);
-  });
+// Emergência
+socket.on("emergency-stop", (data) => {
+  document.getElementById("cycleStatus").textContent = "🚨 Emergência!";
+  window.helmetMistApp?.showNotification("Emergência detectada! Ciclo interrompido.", "error");
+});
 
-  socket.on('disconnect', () => {
-    Utils.log("⚠️ Desconectado do servidor de pagamentos", "warn");
-    if (onDisconnect) onDisconnect();
-  });
+// Ação de dispositivo
+socket.on("device-action", (data) => {
+  document.getElementById("cycleStatus").textContent = `⚙️ Ação: ${data.action}`;
+  window.helmetMistApp?.showNotification(`Dispositivo executou ação: ${data.action}`, "info");
+});
 
-  socket.on('payment-status-update', (paymentData) => {
-    Utils.log("💳 Atualização de pagamento recebida:", "info", paymentData);
-    if (onPaymentUpdate) onPaymentUpdate(paymentData);
-  });
-}
+// Status de pagamento
+socket.on("payment-status-update", (data) => {
+  window.helmetMistApp?.showNotification(
+    `💳 Pagamento: ${data.status}`,
+    data.status === "aprovado" ? "success" : "warning"
+  );
+});
+
+// Sensores em tempo real
+socket.on("sensor-update", (data) => {
+  const safetyInfo = document.getElementById("safetyInfo");
+  safetyInfo.classList.remove("hidden");
+  safetyInfo.querySelector("ul").innerHTML = `
+    <li>🚪 Porta: ${data.door ? "Fechada" : "Aberta"}</li>
+    <li>🌡️ Temp: ${data.temperature}°C</li>
+    <li>💧 Umidade: ${data.humidity}%</li>
+    <li>🌀 Ozônio: ${data.ozone} ppm</li>
+    <li>🔆 UV: ${data.uv ? "Ligado" : "Desligado"}</li>
+  `;
+});
+
+// Progresso do ciclo
+socket.on("cycle-progress", (step) => {
+  document.getElementById("cycleStatus").textContent = `Etapa ${step} em andamento...`;
+});
+
+// Logs do sistema
+socket.on("system-log", (msg) => {
+  window.helmetMistApp?.showNotification(`📝 Log: ${msg}`, "info");
+});
 
 
             const FIREBASE_CONFIG = window.CLEAN_HELMET_CONFIG.firebase;
@@ -2515,6 +2536,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
