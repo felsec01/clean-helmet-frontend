@@ -134,36 +134,42 @@ class OfflineManager {
   }
 
   async startSyncProcess() {
-    if (this.state.syncInProgress || this.syncQueue.length === 0) return;
-    
-    this.state.syncInProgress = true;
-    Utils.log(`Iniciando sincronização de ${this.syncQueue.length} itens`, 'info');
-    
-    while (this.syncQueue.length > 0 && this.state.isOnline) {
-      const item = this.syncQueue.shift();
-      
-      try {
-        await this.syncItem(item);
-        Utils.log(`Item sincronizado: ${item.type}`, 'success');
-      } catch (error) {
-        item.retries++;
-        if (item.retries < 3) {
-          this.syncQueue.push(item); // Recoloca na fila
-        }
-        Utils.log(`Erro na sincronização: ${error.message}`, 'error');
-      }
-      
-      // Pequena pausa entre sincronizações
-      await new Promise(resolve => setTimeout(resolve, 100));
+  if (this.state.syncInProgress || this.syncQueue.length === 0) return;
+  
+  this.state.syncInProgress = true;
+  Utils.log(`Iniciando sincronização de ${this.syncQueue.length} itens`, 'info');
+  
+  while (this.syncQueue.length > 0 && this.state.isOnline) {
+    const item = this.syncQueue.shift();
+
+    // 🔹 Evita flood de logs nulos
+    if (!item || !item.data) {
+      Utils.log("Ignorando item nulo na sincronização", "warn");
+      continue;
     }
-    
-    this.state.syncInProgress = false;
-    this.state.lastSyncTime = Date.now();
-    this.state.queueSize = this.syncQueue.length;
-    this.saveSyncQueue();
-    
-    Utils.log('Sincronização concluída', 'success');
+
+    try {
+      await this.syncItem(item);
+      Utils.log(`Item sincronizado: ${item.type}`, "success");
+    } catch (error) {
+      item.retries++;
+      if (item.retries < 3) {
+        this.syncQueue.push(item); // Recoloca na fila
+      }
+      Utils.log(`Erro na sincronização: ${error.message}`, "error");
+    }
+
+    // Pequena pausa entre sincronizações
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
+  
+  this.state.syncInProgress = false;
+  this.state.lastSyncTime = Date.now();
+  this.state.queueSize = this.syncQueue.length;
+  this.saveSyncQueue();
+  
+  Utils.log("Sincronização concluída", "success");
+}
 
   async syncItem(item) {
     // Implementação básica - expandir conforme necessário
@@ -266,3 +272,4 @@ class OfflineManager {
 // Disponibiliza globalmente
 
 window.OfflineManager = OfflineManager;
+
