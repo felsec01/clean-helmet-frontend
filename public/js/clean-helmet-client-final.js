@@ -34,6 +34,38 @@ const SERVER_URL = window.location.hostname === "localhost"
   ? "http://localhost:3000"   // porta do backend local
   : "https://server-hibrido-js-1.onrender.com"; // URL do Render
 
+// ===== UTILITÁRIOS =====
+const Utils = {
+  log: (message, type = 'info', data = null) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const prefix = `[${timestamp}] Clean Helmet:`;
+
+    switch (type) {
+      case 'error': console.error(prefix, message, data); break;
+      case 'warn': console.warn(prefix, message, data); break;
+      case 'success': console.log(`%c${prefix} ${message}`, 'color: #10b981', data); break;
+      default: console.log(prefix, message, data);
+    }
+
+    // Log offline se disponível
+    if (window.helmetMistApp?.components?.offlineManager) {
+      window.helmetMistApp.components.offlineManager.saveLog(type, {
+        message, data, timestamp: Date.now()
+      });
+    }
+  },
+
+  generateId: () => Date.now().toString(36) + Math.random().toString(36).substr(2),
+  formatTime: (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  },
+  formatCurrency: (cents) => `R$ ${(cents / 100).toFixed(2).replace('.', ',')}`,
+  cleanObjectForFirebase: (obj) => { /* ... mantém igual ... */ },
+  safeLocalStorage: { /* ... mantém igual ... */ }
+};
+
 // === Integração de Socket.IO com a UI ===
 
 // Conexão e desconexão
@@ -90,10 +122,16 @@ socket.on("system-log", (msg) => {
   window.helmetMistApp?.showNotification(`📝 Log: ${msg}`, "info");
 });
 
-
-            const FIREBASE_CONFIG = window.CLEAN_HELMET_CONFIG.firebase;
-firebase.initializeApp(FIREBASE_CONFIG);
-
+            // Inicializa Firebase buscando config do backend
+fetch("/firebase-config")
+  .then(res => res.json())
+  .then(config => {
+    firebase.initializeApp(config);
+    Utils.log("🔥 Firebase inicializado com config do backend", "success");
+  })
+  .catch(err => {
+    Utils.log("Erro ao carregar Firebase config", "error", err);
+  });
 
 const demoAds = [
   {
@@ -2536,6 +2574,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
