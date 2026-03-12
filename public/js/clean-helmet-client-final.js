@@ -123,7 +123,7 @@ socket.on("system-log", (msg) => {
 });
 
             // Inicializa Firebase buscando config do backend
-fetch("/config.js")
+fetch("/firebase-config")
   .then(res => res.json())
   .then(config => {
     firebase.initializeApp(config);
@@ -160,18 +160,6 @@ const demoAds = [
   }
 ];
 
-// ===== UTILITÁRIOS =====
-const Utils = {
-  log: (message, type = 'info', data = null) => {
-  const timestamp = new Date().toLocaleTimeString();
-  const prefix = `[${timestamp}] Clean Helmet:`;
-  
-  switch (type) {
-    case 'error': console.error(prefix, message, data); break;
-    case 'warn': console.warn(prefix, message, data); break;
-    case 'success': console.log(`%c${prefix} ${message}`, 'color: #10b981', data); break;
-    default: console.log(prefix, message, data);
-  }
   
   // 🆕 ADICIONAR ESTAS 5 LINHAS AQUI:
   // Log para sistema offline se disponível
@@ -2574,6 +2562,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
