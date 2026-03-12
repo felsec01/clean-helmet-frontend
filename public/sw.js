@@ -66,12 +66,16 @@ self.addEventListener('fetch', (event) => {
         return response;
       }
       return fetch(event.request).then((networkResponse) => {
-        const responseClone = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
-        });
-        return networkResponse;
-      });
+  // Só cacheia se for GET
+  if (event.request.method === 'GET' && networkResponse && networkResponse.status === 200) {
+    const responseClone = networkResponse.clone();
+    caches.open(CACHE_NAME).then((cache) => {
+      cache.put(event.request, responseClone);
+    });
+  }
+  return networkResponse;
+});
+
     }).catch(() => {
       if (event.request.mode === 'navigate') {
         return caches.match('/index.html');
@@ -79,6 +83,7 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
 
 
 
