@@ -123,7 +123,7 @@ socket.on("system-log", (msg) => {
 });
 
             // Inicializa Firebase buscando config do backend
-fetch("/firebase-config")
+fetch("/config.js")
   .then(res => res.json())
   .then(config => {
     firebase.initializeApp(config);
@@ -2574,6 +2574,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
