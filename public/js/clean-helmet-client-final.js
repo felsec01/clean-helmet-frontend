@@ -709,14 +709,13 @@ const isImageUrl = ad.image && (
     const settings = Utils.safeLocalStorage.get('helmetmist-settings', {});
     
     this.changeTheme(settings.theme || 'dark');
-    this.setVolume(settings.volume || CONFIG.volume.default);
     this.state.adsPlaying = settings.adsPlaying !== false;
     this.state.isFirstCycle = settings.isFirstCycle !== false;
   }
 
   // ===== ATUALIZAÇÃO DA UI =====
   updateUI() {
-    this.updateVolumeDisplay();
+    
     this.updateThemeButton();
     this.updateConnectionStatus();
   }
@@ -2558,6 +2557,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
