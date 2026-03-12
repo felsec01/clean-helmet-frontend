@@ -47,7 +47,7 @@ const Utils = {
       default: console.log(prefix, message, data);
     }
 
-    // Log offline se disponível
+    // Log offline se disponível (mantido dentro da função log)
     if (window.helmetMistApp?.components?.offlineManager) {
       window.helmetMistApp.components.offlineManager.saveLog(type, {
         message, data, timestamp: Date.now()
@@ -56,14 +56,54 @@ const Utils = {
   },
 
   generateId: () => Date.now().toString(36) + Math.random().toString(36).substr(2),
+
   formatTime: (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   },
-  formatCurrency: (cents) => `R$ ${(cents / 100).toFixed(2).replace('.', ',')}`,
-  cleanObjectForFirebase: (obj) => { /* ... mantém igual ... */ },
-  safeLocalStorage: { /* ... mantém igual ... */ }
+
+  formatCurrency: (cents) => {
+    return `R$ ${(cents / 100).toFixed(2).replace('.', ',')}`;
+  },
+
+  cleanObjectForFirebase: (obj) => {
+    if (obj === null || typeof obj !== 'object') return obj;
+    
+    const cleaned = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined && value !== null) {
+        if (typeof value === 'object' && !Array.isArray(value)) {
+          cleaned[key] = Utils.cleanObjectForFirebase(value);
+        } else {
+          cleaned[key] = value;
+        }
+      }
+    }
+    return cleaned;
+  },
+
+  safeLocalStorage: {
+    get: (key, defaultValue = null) => {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+      } catch (error) {
+        Utils.log(`Erro ao ler localStorage [${key}]:`, 'error', error);
+        return defaultValue;
+      }
+    },
+
+    set: (key, value) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+      } catch (error) {
+        Utils.log(`Erro ao salvar localStorage [${key}]:`, 'error', error);
+        return false;
+      }
+    }
+  }
 };
 
 // === Integração de Socket.IO com a UI ===
@@ -160,66 +200,16 @@ const demoAds = [
   }
 ];
 
+
+
+
+
+
+
+
+
+
   
-  // 🆕 ADICIONAR ESTAS 5 LINHAS AQUI:
-  // Log para sistema offline se disponível
-  if (window.helmetMistApp?.components?.offlineManager) {
-    window.helmetMistApp.components.offlineManager.saveLog(type, {
-      message, data, timestamp: Date.now()
-    });
-  }
-
-  generateId: () => Date.now().toString(36) + Math.random().toString(36).substr(2),
-
-  formatTime: (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  },
-
-  formatCurrency: (cents) => {
-    return `R$ ${(cents / 100).toFixed(2).replace('.', ',')}`;
-  },
-
-  cleanObjectForFirebase: (obj) => {
-    if (obj === null || typeof obj !== 'object') return obj;
-    
-    const cleaned = {};
-    for (const [key, value] of Object.entries(obj)) {
-      if (value !== undefined && value !== null) {
-        if (typeof value === 'object' && !Array.isArray(value)) {
-          cleaned[key] = Utils.cleanObjectForFirebase(value);
-        } else {
-          cleaned[key] = value;
-        }
-      }
-    }
-    return cleaned;
-  },
-
-  safeLocalStorage: {
-    get: (key, defaultValue = null) => {
-      try {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue;
-      } catch (error) {
-        Utils.log(`Erro ao ler localStorage [${key}]:`, 'error', error);
-        return defaultValue;
-      }
-    },
-
-    set: (key, value) => {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-        return true;
-      } catch (error) {
-        Utils.log(`Erro ao salvar localStorage [${key}]:`, 'error', error);
-        return false;
-      }
-    }
-  }
-};
-
 // ===== CLASSE PRINCIPAL DA APLICAÇÃO =====
 class CleanHelmetClientApp {
   constructor() {
@@ -2561,6 +2551,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
