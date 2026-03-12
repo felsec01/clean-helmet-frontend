@@ -341,8 +341,7 @@ if (startBtn) {
 
     // Controles de tema e volume
     document.getElementById('themeToggle')?.addEventListener('click', () => this.toggleTheme());
-    document.getElementById('volumeUp')?.addEventListener('click', () => this.adjustVolume(10));
-    document.getElementById('volumeDown')?.addEventListener('click', () => this.adjustVolume(-10));
+    
 
     // Controles de anúncios
     document.getElementById('adsPrev')?.addEventListener('click', () => this.previousAd());
@@ -406,7 +405,6 @@ if (startBtn) {
     document.getElementById('themeToggle')?.addEventListener('dblclick', () => this.openSettings());
     document.getElementById('closeSettings')?.addEventListener('click', () => this.closeSettings());
     document.getElementById('themeSelect')?.addEventListener('change', (e) => this.changeTheme(e.target.value));
-    document.getElementById('volumeSlider')?.addEventListener('input', (e) => this.setVolume(parseInt(e.target.value)));
     
     document.getElementById('settingsModal')?.addEventListener('click', (e) => {
       if (e.target.id === 'settingsModal') this.closeSettings();
@@ -672,10 +670,10 @@ const isImageUrl = ad.image && (
       modal.classList.add('active');
       
       const themeSelect = document.getElementById('themeSelect');
-      const volumeSlider = document.getElementById('volumeSlider');
+      
       
       if (themeSelect) themeSelect.value = this.state.currentTheme;
-      if (volumeSlider) volumeSlider.value = this.state.volume;
+      
     }
   }
 
@@ -687,7 +685,6 @@ const isImageUrl = ad.image && (
   saveSettings() {
     const settings = {
       theme: this.state.currentTheme,
-      volume: this.state.volume,
       adsPlaying: this.state.adsPlaying,
       isFirstCycle: this.state.isFirstCycle
     };
@@ -2547,6 +2544,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
