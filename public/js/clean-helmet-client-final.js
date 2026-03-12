@@ -232,28 +232,42 @@ class CleanHelmetClientApp {
       
       // 🆕 NOVOS COMPONENTES v4.0.0
 if (typeof OfflineManager !== 'undefined') {
+  Utils.log("DEBUG: Inicializando OfflineManager...");
   this.components.offlineManager = new OfflineManager(this);
 }
 if (typeof SessionManager !== 'undefined') {
+  Utils.log("DEBUG: Inicializando SessionManager...");
   this.components.sessionManager = new SessionManager(this);
 }
 if (typeof MercadoPagoManager !== 'undefined') {
+  Utils.log("DEBUG: Inicializando MercadoPagoManager...");
   this.components.mercadoPagoManager = new MercadoPagoManager(this);
 }
       
       // Inicializa componentes principais (síncronos)
+      Utils.log("DEBUG: Inicializando CycleManager...");
       this.components.cycleManager = new ClientCycleManager(this);
+      
+      Utils.log("DEBUG: Inicializando NotificationManager...");
       this.components.notificationManager = new NotificationManager();
+      
+      Utils.log("DEBUG: Inicializando PaymentManager...");
       this.components.paymentManager = new PaymentManager(this);
       
       // Configura interface (síncrono)
+      Utils.log("DEBUG: Configurando interface...");
       this.setupInterfaceControls();
       this.setupKeyboardShortcuts();
       this.setupSettingsModal();
       
       // Carrega configurações e inicializa anúncios (síncronos)
+      Utils.log("DEBUG: Carregando configurações...");
       this.loadSettings();
+      
+      Utils.log("DEBUG: Inicializando anúncios...");
       this.initializeAds();
+
+      Utils.log("DEBUG: Atualizando UI...");
       this.updateUI();
       
       this.state.initialized = true;
@@ -2544,6 +2558,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
