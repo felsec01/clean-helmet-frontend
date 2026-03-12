@@ -24,7 +24,27 @@
   <!-- Styles -->
   <link rel="stylesheet" href="styles-touch-sequential-complete.css">
   
-  
+  <!-- 🆕 Bloco de scripts -->
+
+   <!-- Socket.IO -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+  <!-- Config com credenciais públicas -->
+  <script src="/js/config.js"></script>
+
+  <!-- Módulos locais -->
+  <script src="/js/offline-manager.js"></script>
+  <script src="/js/session-manager.js"></script>
+  <script src="/js/mercadopago-manager.js"></script>
+  <script src="/js/socket-manager.js"></script>
+  <script src="/js/clean-helmet-client-final.js"></script>
+
   
   <!-- PWA Manifest (desabilitado para desenvolvimento local) -->
   <!-- <link rel="manifest" href="manifest.json"> -->
@@ -290,26 +310,10 @@
   <!-- Notifications Container -->
   <div id="notifications" class="notifications-container"></div>
 
-  <!-- 🆕 Bloco de scripts -->
 
-   <!-- Socket.IO -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-  <!-- Config com credenciais públicas -->
-  <script src="/js/config.js"></script>
 
-  <!-- Módulos locais -->
-  <script src="/js/offline-manager.js"></script>
-  <script src="/js/session-manager.js"></script>
-  <script src="/js/mercadopago-manager.js"></script>
-  <script src="/js/socket-manager.js"></script>
-  <script src="/js/clean-helmet-client-final.js"></script>
   
   <!-- Screen Info Script -->
   <script>
@@ -484,6 +488,7 @@
 </body>
 
 </html>
+
 
 
 
