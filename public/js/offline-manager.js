@@ -93,6 +93,11 @@ class OfflineManager {
   }
 
   saveLog(type, data) {
+    // 🔹 Ignora logs inválidos ou nulos
+  if (!data || (typeof data === "object" && Object.keys(data).length === 0)) {
+    Utils.log("Ignorando tentativa de salvar log vazio", "warn");
+    return;
+  } 
     const logEntry = {
       id: Utils.generateId(),
       type,
@@ -272,4 +277,5 @@ class OfflineManager {
 // Disponibiliza globalmente
 
 window.OfflineManager = OfflineManager;
+
 
