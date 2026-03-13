@@ -41,11 +41,36 @@ const Utils = {
     const prefix = `[${timestamp}] Clean Helmet:`;
 
     switch (type) {
-      case 'error': console.error(prefix, message, data); break;
-      case 'warn': console.warn(prefix, message, data); break;
-      case 'success': console.log(`%c${prefix} ${message}`, 'color: #10b981', data); break;
-      default: console.log(prefix, message, data);
-    }
+  case "error":
+    data !== null && data !== undefined
+      ? console.error(prefix, message, data)
+      : console.error(prefix, message);
+    break;
+
+  case "warn":
+    data !== null && data !== undefined
+      ? console.warn(prefix, message, data)
+      : console.warn(prefix, message);
+    break;
+
+  case "success":
+    data !== null && data !== undefined
+      ? console.log(`%c${prefix} ${message}`, "color: #10b981", data)
+      : console.log(`%c${prefix} ${message}`, "color: #10b981");
+    break;
+
+  case "info":
+    data !== null && data !== undefined
+      ? console.info(prefix, message, data)
+      : console.info(prefix, message);
+    break;
+
+  default:
+    data !== null && data !== undefined
+      ? console.log(prefix, message, data)
+      : console.log(prefix, message);
+}
+
 
     // Log offline se disponível (mantido dentro da função log)
     if (window.helmetMistApp?.components?.offlineManager) {
@@ -2557,6 +2582,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
