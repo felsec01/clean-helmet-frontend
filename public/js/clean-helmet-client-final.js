@@ -309,10 +309,12 @@ if (typeof SessionManager !== 'undefined') {
   Utils.log("DEBUG: Inicializando SessionManager...");
   this.components.sessionManager = new SessionManager(this);
 }
-if (typeof MercadoPagoManager !== 'undefined') {
-  Utils.log("DEBUG: Inicializando MercadoPagoManager...");
-  this.components.mercadoPagoManager = new MercadoPagoManager(this);
-}
+
+      // Desativado para evitar conflito com PaymentManager
+//if (typeof MercadoPagoManager !== 'undefined') {
+  //Utils.log("DEBUG: Inicializando MercadoPagoManager...");
+  //this.components.mercadoPagoManager = new MercadoPagoManager(this);
+//}
       
       // Inicializa componentes principais (síncronos)
       Utils.log("DEBUG: Inicializando CycleManager...");
@@ -513,7 +515,8 @@ if (startBtn) {
   }
 }
 
- // 🆕 Novo método para pagamentos (MercadoPago - novos componentes)
+/*
+  // 🆕 Novo método para pagamentos (MercadoPago - novos componentes)
 initiatePaymentFlow() {
   console.log("DEBUG: initiatePaymentFlow chamado");
   
@@ -544,7 +547,33 @@ initiatePaymentFlowFallback() {
   } catch (error) {
     Utils.log('Erro ao iniciar pagamento:', 'error', error);
     this.showNotification('❌ Sistema de pagamento temporariamente indisponível', 'error');
-    
+    */
+
+  initiatePaymentFlow() {
+  console.log("DEBUG: initiatePaymentFlow chamado");
+
+  if (this.components.cycleManager.isRunning) {
+    this.showNotification('Ciclo já está em execução!', 'warning');
+    return;
+  }
+
+  try {
+    this.components.paymentManager.showPaymentModal();
+    this.showNotification('💳 Selecione o método de pagamento para continuar', 'info');
+  } catch (error) {
+    Utils.log('Erro ao iniciar pagamento:', 'error', error);
+    this.showNotification('❌ Sistema de pagamento temporariamente indisponível', 'error');
+
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      setTimeout(() => {
+        this.showNotification('🔧 Modo desenvolvimento: Ciclo liberado', 'warning');
+        this.startCycle();
+      }, 3000);
+    }
+  }
+}
+
+  
     // Modo desenvolvimento - permite pular pagamento
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       setTimeout(() => {
@@ -2703,6 +2732,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
