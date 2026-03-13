@@ -40,36 +40,42 @@ const Utils = {
     const timestamp = new Date().toLocaleTimeString();
     const prefix = `[${timestamp}] Clean Helmet:`;
 
-    switch (type) {
-  case "error":
-    data !== null && data !== undefined
-      ? console.error(prefix, message, data)
-      : console.error(prefix, message);
-    break;
+    // ===== Utils.log v4.0.0 corrigido =====
+Utils.log = function(message, type = "info", data = null) {
+  const prefix = `[${new Date().toLocaleTimeString()}] Clean Helmet:`;
 
-  case "warn":
-    data !== null && data !== undefined
-      ? console.warn(prefix, message, data)
-      : console.warn(prefix, message);
-    break;
+  switch (type) {
+    case "error":
+      data !== null && data !== undefined
+        ? console.error(prefix, message, data)
+        : console.error(prefix, message);
+      break;
 
-  case "success":
-    data !== null && data !== undefined
-      ? console.log(`%c${prefix} ${message}`, "color: #10b981", data)
-      : console.log(`%c${prefix} ${message}`, "color: #10b981");
-    break;
+    case "warn":
+      data !== null && data !== undefined
+        ? console.warn(prefix, message, data)
+        : console.warn(prefix, message);
+      break;
 
-  case "info":
-    data !== null && data !== undefined
-      ? console.info(prefix, message, data)
-      : console.info(prefix, message);
-    break;
+    case "success":
+      data !== null && data !== undefined
+        ? console.log(`%c${prefix} ${message}`, "color: #10b981; font-weight:bold;", data)
+        : console.log(`%c${prefix} ${message}`, "color: #10b981; font-weight:bold;");
+      break;
 
-  default:
-    data !== null && data !== undefined
-      ? console.log(prefix, message, data)
-      : console.log(prefix, message);
-}
+    case "info":
+      data !== null && data !== undefined
+        ? console.info(prefix, message, data)
+        : console.info(prefix, message);
+      break;
+
+    default:
+      data !== null && data !== undefined
+        ? console.log(prefix, message, data)
+        : console.log(prefix, message);
+  }
+};
+
 
 
     // Log offline se disponível (mantido dentro da função log)
@@ -2582,6 +2588,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
