@@ -164,10 +164,49 @@ socket.on("device-action", (data) => {
 
 // Status de pagamento
 socket.on("payment-status-update", (data) => {
+  // Notificação visual
   window.helmetMistApp?.showNotification(
     `💳 Pagamento: ${data.status}`,
-    data.status === "aprovado" ? "success" : "warning"
+    data.status === "approved" ? "success" : "warning"
   );
+
+  const modal = document.querySelector('.payment-modal');
+  const paymentManager = window.helmetMistApp?.components?.paymentManager;
+
+  if (!modal || !paymentManager) return;
+
+  // Pagamento aprovado
+  if (data.status === "approved") {
+    paymentManager.handlePaymentSuccess(modal, data.method, data.id.toString());
+  }
+
+  // Pagamento rejeitado
+  else if (data.status === "rejected") {
+    const content = modal.querySelector('.payment-content');
+    if (content) {
+      content.innerHTML = `
+        <div class="payment-error">
+          <div class="payment-error-icon">❌</div>
+          <h3>Pagamento recusado</h3>
+          <p>Método: ${data.method}</p>
+          <p>Tente novamente com outro cartão ou PIX.</p>
+        </div>
+      `;
+    }
+  }
+
+  // Pagamento pendente
+  else if (data.status === "pending") {
+    const content = modal.querySelector('.payment-content');
+    if (content) {
+      content.innerHTML = `
+        <div class="payment-processing">
+          <div class="payment-spinner"></div>
+          <h4>Aguardando confirmação do pagamento...</h4>
+        </div>
+      `;
+    }
+  }
 });
 
 // Sensores em tempo real
@@ -1317,22 +1356,33 @@ class PaymentManager {
   `;
 
   try {
-    const response = await fetch("https://server-hibrido-js-1.onrender.com/api/payments/create", {
+    const response = await fetch(`${SERVER_URL}/api/pix`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ method: "pix", amount: PAYMENT_CONFIG.prices.cycle })
+      body: JSON.stringify({ amount: PAYMENT_CONFIG.prices.cycle })
     });
+
     const data = await response.json();
 
-    content.innerHTML = `
-      <div class="payment-header"><h3>📱 Pagamento PIX</h3><button class="payment-close">✕</button></div>
-      <iframe src="${data.init_point}" style="width:100%;height:500px;border:none;"></iframe>
-    `;
-
+    if (data.qrCodeBase64) {
+      content.innerHTML = `
+        <div class="payment-header"><h3>📱 Pagamento PIX</h3><button class="payment-close">✕</button></div>
+        <div class="payment-body">
+          <img src="data:image/png;base64,${data.qrCodeBase64}" alt="QR Code PIX" style="width:250px;margin:20px auto;display:block;" />
+          <p><strong>Chave copia-e-cola:</strong></p>
+          <code style="display:block;margin:10px 0;">${data.qrCode}</code>
+          <p>Expira em: ${new Date(data.expiration).toLocaleString()}</p>
+        </div>
+      `;
+    } else {
+      content.innerHTML = `<h3>❌ Falha ao gerar PIX</h3>`;
+    }
   } catch (error) {
     Utils.log("Erro ao iniciar pagamento PIX", "error", error);
+    content.innerHTML = `<h3>⚠️ Erro na comunicação com servidor PIX</h3>`;
   }
 }
+
 
   async initCardPayment(modal) {
   const content = modal.querySelector('.payment-content');
@@ -1345,20 +1395,85 @@ class PaymentManager {
   `;
 
   try {
-    const response = await fetch("https://server-hibrido-js-1.onrender.com/api/payments/create", {
+    const response = await fetch(`${SERVER_URL}${PAYMENT_CONFIG.physicalMachine.endpoint}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ method: "card", amount: PAYMENT_CONFIG.prices.cycle })
+      body: JSON.stringify({ amount: PAYMENT_CONFIG.prices.cycle })
     });
+
     const data = await response.json();
 
-    content.innerHTML = `
-      <div class="payment-header"><h3>💳 Pagamento Cartão</h3><button class="payment-close">✕</button></div>
-      <iframe src="${data.init_point}" style="width:100%;height:500px;border:none;"></iframe>
-    `;
+    // Status inicial: aguardando interação
+    if (data.status === "waiting_card") {
+      content.innerHTML = `
+        <div class="payment-header"><h3>💳 Pagamento Cartão</h3><button class="payment-close">✕</button></div>
+        <p>Insira, passe ou aproxime o cartão...</p>
+      `;
+    }
+
+    // NFC detectado
+    else if (data.status === "nfc_detected") {
+      content.innerHTML = `
+        <div class="payment-header"><h3>💳 Pagamento Cartão</h3><button class="payment-close">✕</button></div>
+        <p>Pagamento por aproximação detectado...</p>
+        <p>Processando...</p>
+      `;
+    }
+
+    // Chip inserido
+    else if (data.status === "chip_inserted") {
+      content.innerHTML = `
+        <div class="payment-header"><h3>💳 Pagamento Cartão</h3><button class="payment-close">✕</button></div>
+        <p>Cartão com chip inserido.</p>
+        <p>Aguardando senha...</p>
+      `;
+    }
+
+    // Tarja lida
+    else if (data.status === "swipe_detected") {
+      content.innerHTML = `
+        <div class="payment-header"><h3>💳 Pagamento Cartão</h3><button class="payment-close">✕</button></div>
+        <p>Cartão passado na tarja magnética.</p>
+        <p>Processando transação...</p>
+      `;
+    }
+
+    // Pagamento aprovado
+    else if (data.status === "approved") {
+      this.handlePaymentSuccess(modal, "card", data.transactionId);
+    }
+
+    // Pagamento recusado
+    else if (data.status === "rejected") {
+      content.innerHTML = `
+        <div class="payment-error">
+          <div class="payment-error-icon">❌</div>
+          <h3>Pagamento recusado</h3>
+          <p>Tente novamente com outro cartão.</p>
+        </div>
+      `;
+    }
+
+    // Timeout ou erro
+    else {
+      content.innerHTML = `
+        <div class="payment-error">
+          <div class="payment-error-icon">⚠️</div>
+          <h3>Erro no pagamento</h3>
+          <p>Status inesperado: ${data.status}</p>
+        </div>
+      `;
+    }
 
   } catch (error) {
     Utils.log("Erro ao iniciar pagamento Cartão", "error", error);
+    content.innerHTML = `
+      <div class="payment-error">
+        <div class="payment-error-icon">⚠️</div>
+        <h3>Erro na comunicação com máquina de cartão</h3>
+        <p>${error.message}</p>
+      </div>
+    `;
   }
 }
 
@@ -2588,6 +2703,7 @@ Utils.log('Tela otimizada: 1280x800 touch', 'info');
 Utils.log('Sistema de pagamentos: PIX + Cartão físico', 'info');
 Utils.log('Use DEBUG.info() para informações do sistema', 'info');
 Utils.log('Use DEBUG.help() para ver todos os comandos disponíveis', 'info');
+
 
 
 
