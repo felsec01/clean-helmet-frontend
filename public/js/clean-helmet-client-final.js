@@ -311,10 +311,10 @@ if (typeof SessionManager !== 'undefined') {
 }
 
       // Desativar para evitar conflito com PaymentManager
-if (typeof MercadoPagoManager !== 'undefined') {
-  Utils.log("DEBUG: Inicializando MercadoPagoManager...");
-  this.components.mercadoPagoManager = new MercadoPagoManager(this);
-}
+//if (typeof MercadoPagoManager !== 'undefined') {
+  //Utils.log("DEBUG: Inicializando MercadoPagoManager...");
+  //this.components.mercadoPagoManager = new MercadoPagoManager(this);
+//}
       
       // Inicializa componentes principais (síncronos)
       Utils.log("DEBUG: Inicializando CycleManager...");
@@ -515,7 +515,7 @@ if (startBtn) {
   }
 }
 
-
+/*
   // 🆕 Novo método para pagamentos (MercadoPago - novos componentes)
 initiatePaymentFlow() {
   console.log("DEBUG: initiatePaymentFlow chamado");
@@ -547,9 +547,9 @@ initiatePaymentFlowFallback() {
   } catch (error) {
     Utils.log('Erro ao iniciar pagamento:', 'error', error);
     this.showNotification('❌ Sistema de pagamento temporariamente indisponível', 'error');
-  
+  */
     
-/*
+
   initiatePaymentFlow() {
   console.log("DEBUG: initiatePaymentFlow chamado");
 
@@ -573,7 +573,7 @@ initiatePaymentFlowFallback() {
     }
   }
 }
-*/
+
   
     // Modo desenvolvimento - permite pular pagamento
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
