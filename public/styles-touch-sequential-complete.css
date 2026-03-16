@@ -180,7 +180,7 @@ body {
 .brand-info h1 {
   font-size: var(--font-size-2xl);
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-light));
+  background: linear-gradient(135deg, var(--accent-cyan), #ffffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -374,7 +374,7 @@ body {
   display: none;
 }
 
-d-content h4 {
+.ad-content h4 {
   font-size: var(--font-size-xl);
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
@@ -508,12 +508,16 @@ d-content h4 {
 /* ===== TELA INICIAL ===== */
 .start-section {
   text-align: center;
-  padding: var(--spacing-2xl) 0;
+  padding: var(--spacing-xl) 0;
 }
 
 .start-content {
   max-width: 500px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
 .start-icon {
@@ -524,7 +528,6 @@ d-content h4 {
   font-size: 80px;
   animation: float 3s ease-in-out infinite;
   filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.3));
-  margin-top: -100px; /* 🔼 sobe a animação */
 }
 
 
@@ -532,25 +535,22 @@ d-content h4 {
   font-size: var(--font-size-3xl);
   font-weight: 700;
   margin-bottom: var(--spacing-md);
-  background: linear-gradient(135deg, var(--primary-blue), var(--primary-light));
+  background: linear-gradient(135deg, var(--accent-cyan), #ffffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-top: -30px;
 }
 
 .start-content p {
   font-size: var(--font-size-lg);
   color: var(--text-secondary);
   margin-bottom: var(--spacing-xl);
-  margin-top: -20px;
 }
 
 .payment-info {
   color: var(--text-secondary);
   font-size: var(--font-size-base);
   margin-bottom: var(--spacing-xl);
-  margin-top: -20px;
 }
 
 .start-btn {
@@ -567,7 +567,6 @@ d-content h4 {
   align-items: center;
   gap: var(--spacing-md);
   margin: 0 auto var(--spacing-lg);
-  margin-top: -20px;
   min-height: 60px;
   box-shadow: var(--shadow-card);
 }
@@ -600,7 +599,6 @@ d-content h4 {
   font-size: var(--font-size-xl);
   font-weight: 600;
   margin-bottom: var(--spacing-lg);
-  margin-top: -20px;
   text-align: center;
   color: var(--text-primary);
 }
@@ -619,7 +617,6 @@ d-content h4 {
   padding: var(--spacing-lg);
   transition: var(--transition-normal);
   opacity: 0.6;
-  margin-top: -10px;
 }
 
 .step-item.active {
@@ -716,7 +713,6 @@ d-content h4 {
   max-height: 140px; /* igual ao .step-item */
   overflow: hidden;
   flex-shrink: 0;
-  margin-top: -10px;
 }
 
 .safety-icon {
@@ -1389,12 +1385,17 @@ d-content h4 {
 }
 
 /* ===== MELHORIAS DE PERFORMANCE ===== */
-.app-container, .header, .main-content, .ads-section, .cycle-section, .footer {
-  will-change: transform;
+/* will-change apenas nos elementos que realmente animam */
+.ad-slide {
+  will-change: opacity, transform;
 }
 
-.ad-slide, .step-item, .notification {
+.notification {
   will-change: opacity, transform;
+}
+
+.loading-spinner {
+  will-change: transform;
 }
 
 /* ===== OTIMIZAÇÕES FINAIS ===== */
@@ -1472,14 +1473,14 @@ button, input, select, textarea {
 
 /* Moldura do "smartphone" */
 .ads-phone-frame {
-  width: 360px;
-  height: 640px;
+  width: clamp(280px, 28vw, 380px);
+  height: clamp(500px, 78vh, 660px);
   background: #111;
   border: 12px solid #333;
   border-radius: 40px;
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
   margin: auto 20px;
-  transform: translateX(-20px); /* 🔼 move 20px para a esquerda */
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1625,4 +1626,15 @@ button, input, select, textarea {
   display: inline-block;
   position: relative;
   top: 6px; /* ajusta a altura para descer o capacete */
+}
+
+/* ===== SETTING INFO BOX (substituição de estilos inline no modal) ===== */
+.setting-info-box {
+  background: var(--bg-tertiary);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-family: monospace;
+  font-size: var(--font-size-sm);
+  line-height: 1.8;
+  color: var(--text-secondary);
 }
