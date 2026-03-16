@@ -25,8 +25,8 @@
   <link rel="stylesheet" href="styles-touch-sequential-complete.css">
   
   
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json">
+  <!-- PWA Manifest (desabilitado para desenvolvimento local) -->
+  <!-- <link rel="manifest" href="manifest.json"> -->
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏍️</text></svg>">
@@ -46,12 +46,13 @@
   </div>
 
   <!-- App Container -->
+  <body>
+<div id="clockDisplay" class="clock-display">
+  <span id="clockTime">--:--</span>
+  <span id="clockDate">--/--/----</span>
+</div>
+
   <div class="main-layout">
-    <!-- Relógio fixo (position: fixed no CSS) -->
-    <div id="clockDisplay" class="clock-display">
-      <span id="clockTime">--:--</span>
-      <span id="clockDate">--/--/----</span>
-    </div>
 
     <!-- Moldura de anúncios tipo smartphone -->
     <div class="ads-phone-frame">
@@ -193,7 +194,7 @@
         <!-- Completion Section -->
         <div id="completionSection" class="completion-section hidden">
           <div class="completion-content">
-            <div class="completion-icon"><img src="/check.png" alt="Ícone de desinfecção concluída com sucesso" style="width: 100px; height: auto;" /></div>
+            <div class="completion-icon"><img src="/check.png" alt="Logo Clean Helmet" style="width: 100px; height: auto;" /></div>
             <h2>Desinfecção Concluída!</h2>
             <p>Seu capacete foi desinfetado com sucesso</p>
             <div class="completion-stats">
@@ -216,6 +217,11 @@
       </div> <!-- app-container -->
     </div> <!-- cycle-section -->
 
+  </div> <!-- main-layout -->
+</body>
+
+    </main>
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
@@ -234,8 +240,7 @@
         </div>
       </div>
     </footer>
-
-  </div> <!-- main-layout -->
+  </div>
 
   <!-- Settings Modal -->
   <div id="settingsModal" class="modal-overlay">
@@ -260,7 +265,7 @@
         
         <div class="setting-group">
           <label>Sistema:</label>
-          <div class="setting-info-box">
+          <div style="background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--border-radius-md); font-family: monospace; font-size: var(--font-size-sm);">
             <div>• Sensores: Porta, Temperatura, Umidade, Ozônio, UV</div>
             <div>• Relés: 7 canais (Ozônio, UV, Ventiladores, Bomba)</div>
             <div>• Comunicação: Serial → Raspberry Pi → Firebase</div>
@@ -270,7 +275,7 @@
         
         <div class="setting-group">
           <label>📱 Informações da Tela:</label>
-          <div class="setting-info-box">
+          <div style="background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--border-radius-md); font-family: monospace; font-size: var(--font-size-sm);">
             <div>• Resolução: <span id="screenResolution">Carregando...</span></div>
             <div>• Tipo: <span id="screenType">Carregando...</span></div>
             <div>• Touch: <span id="touchSupport">Carregando...</span></div>
@@ -431,6 +436,7 @@
   updateClock(); // inicializa imediatamente
 </script>
 
+<!-- 🆕 Bloco de scripts -->
 
    <!-- Socket.IO -->
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -451,7 +457,26 @@
   <script src="/js/socket-manager.js"></script>
   <script src="/js/clean-helmet-client-final.js"></script>
   
+  <script>
+  console.log("=== Clean Helmet Diagnóstico ===");
 
+  // Verifica se o app inicializou
+  console.log("App inicializado?", window.helmetMistApp?.state?.initialized);
+
+  // Verifica Firebase
+  try {
+    console.log("Firebase carregado?", typeof firebase !== "undefined");
+    console.log("Firebase apps ativos:", firebase.apps?.length || 0);
+  } catch (e) {
+    console.warn("Firebase não disponível:", e);
+  }
+
+  // Verifica Socket.IO
+  console.log("Socket.IO carregado?", typeof io !== "undefined");
+
+  // Verifica se socket foi criado
+  console.log("Socket conectado?", window.socket?.connected);
+</script>
 
 </body>
 
