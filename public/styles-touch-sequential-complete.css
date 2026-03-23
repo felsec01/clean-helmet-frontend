@@ -831,7 +831,6 @@ body {
 
 /* ===== FOOTER ===== */
 .footer {
-  grid-area: footer;
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
@@ -1444,14 +1443,10 @@ button, input, select, textarea {
 }
 /* Layout principal com duas colunas */
 .main-layout {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  grid-template-rows: 1fr auto;
-  grid-template-areas:
-    "ads cycle"
-    "ads footer";
-  height: 100vh;
-  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  height: auto;
+  width: auto;
   overflow: hidden;
 }
 
@@ -1466,18 +1461,18 @@ button, input, select, textarea {
   min-height: 600px;
 }
 .cycle-section {
-  grid-area: cycle;
-  overflow-y: auto;
+  flex: 1; /* ocupa o espaço restante ao lado da moldura */
+  height: 100vh; /* garante altura total da tela */
+  overflow-y: auto; /* permite rolagem interna se necessário */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  min-width: 0;
+  min-width: 0; /* evita quebra de layout */
 }
 
 
 /* Moldura do "smartphone" */
 .ads-phone-frame {
-  grid-area: ads;
   width: clamp(280px, 28vw, 380px);
   height: clamp(500px, 78vh, 660px);
   background: #111;
